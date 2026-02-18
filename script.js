@@ -1,8 +1,15 @@
 /* ═══════════════════════════════════════════════
+   GSAP REGISTER
+═══════════════════════════════════════════════ */
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+/* ═══════════════════════════════════════════════
    ДИАГНОСТИКА
 ═══════════════════════════════════════════════ */
 console.log("GSAP:", typeof gsap);
-console.log("ScrollTrigger:", !!(typeof gsap !== 'undefined' && gsap.plugins && gsap.plugins.ScrollTrigger));
+console.log("ScrollTrigger:", typeof ScrollTrigger !== 'undefined' && !!gsap.plugins.scrollTrigger);
 console.log("caseModal:", !!document.getElementById('caseModal'));
 console.log("case-image-card count:", document.querySelectorAll('.case-image-card').length);
 console.log("anim-fade-up count:", document.querySelectorAll('.anim-fade-up').length);
