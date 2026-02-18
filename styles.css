@@ -1,0 +1,44 @@
+body {
+  font-family: Arial, sans-serif;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 16px;
+  line-height: 1.5;
+}
+
+.tag {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+h1 {
+  margin: 8px 0 10px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 14px;
+  border: 1px solid #111;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #111;
+  margin-right: 10px;
+}
+
+.muted {
+  color: #666;
+}
+
+ul {
+  padding-left: 18px;
+}
+
+.box {
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 18px;
+}
