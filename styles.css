@@ -1284,8 +1284,190 @@ section:nth-child(even) {
 @media (max-width: 600px) {
   section { padding: 64px 0; }
   .container { padding: 0 16px; }
-  
+
   .process-steps { gap: 12px; }
   .system-flow { gap: 8px; }
   .flow-step { font-size: 12px; padding: 8px 14px; }
+}
+
+/* ═══════════════ SCROLL ANIMATIONS ═══════════════ */
+
+/* Базовые состояния для элементов до появления */
+.anim-fade-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.anim-fade-in {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.anim-fade-up.is-visible,
+.anim-fade-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Задержки для stagger-эффекта */
+.anim-delay-1 { transition-delay: 0.1s; }
+.anim-delay-2 { transition-delay: 0.2s; }
+.anim-delay-3 { transition-delay: 0.3s; }
+.anim-delay-4 { transition-delay: 0.4s; }
+.anim-delay-5 { transition-delay: 0.5s; }
+
+/* Hero — плавное появление при загрузке */
+.hero-content .section-label { animation: heroFadeUp 0.6s ease 0.1s both; }
+.hero-content .section-title  { animation: heroFadeUp 0.6s ease 0.25s both; }
+.hero-content .section-subtitle { animation: heroFadeUp 0.6s ease 0.4s both; }
+.hero-content .cta-button     { animation: heroFadeUp 0.6s ease 0.5s both; }
+.hero-content .hero-stat-row  { animation: heroFadeUp 0.6s ease 0.65s both; }
+.hero-content .hero-footnote  { animation: heroFadeUp 0.6s ease 0.75s both; }
+
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Кейсы — cursor pointer для кликабельности */
+.case-image-card {
+  cursor: pointer;
+}
+
+/* ═══════════════ MODAL ═══════════════ */
+.case-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.case-modal-overlay.is-open {
+  display: flex;
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.case-modal-inner {
+  position: relative;
+  max-width: 900px;
+  width: 100%;
+  animation: modalSlideUp 0.35s ease;
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.case-modal-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+}
+
+.case-modal-close {
+  position: absolute;
+  top: -44px;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  line-height: 1;
+}
+
+.case-modal-close:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.case-modal-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.case-modal-nav:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.case-modal-prev { left: -56px; }
+.case-modal-next { right: -56px; }
+
+.case-modal-counter {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  font-family: 'Space Grotesk', monospace;
+}
+
+@media (max-width: 700px) {
+  .case-modal-prev { left: -40px; }
+  .case-modal-next { right: -40px; }
+  .case-modal-nav  { width: 36px; height: 36px; font-size: 16px; }
+}
+
+/* ═══════════════ CALC NUMBER ANIMATION ═══════════════ */
+.calc-result-big {
+  transition: color 0.3s ease;
+}
+
+.calc-result-big.updating {
+  color: var(--accent);
+}
+
+/* ═══════════════ PREFERS-REDUCED-MOTION ═══════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up,
+  .anim-fade-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .hero-content .section-label,
+  .hero-content .section-title,
+  .hero-content .section-subtitle,
+  .hero-content .cta-button,
+  .hero-content .hero-stat-row,
+  .hero-content .hero-footnote {
+    animation: none;
+  }
+
+  .case-modal-overlay.is-open { animation: none; }
+  .case-modal-inner { animation: none; }
+  .calc-result-big { transition: none; }
 }
