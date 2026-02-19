@@ -1347,18 +1347,15 @@ section:nth-child(even) {
   will-change: transform, opacity;
 }
 
-/* line-break: invisible block with no stagger delay */
-.sys-word-break {
+/* line-break: br element for natural title line break */
+br.sys-word-break {
   display: block;
-  height: 0;
-  width: 100%;
-  overflow: hidden;
-  pointer-events: none;
+  content: '';
 }
 
 .sys-word-accent {
-  /* subtle warm glow on "вместе." */
-  filter: drop-shadow(0 0 20px rgba(245,158,11,0.3));
+  /* subtle warm glow on "вместе." — works with gradient text */
+  filter: drop-shadow(0 0 18px rgba(245,158,11,0.45)) brightness(1.05);
 }
 
 /* ── SVG wires ── */
@@ -1379,8 +1376,8 @@ section:nth-child(even) {
 .sys-wire {
   stroke: rgba(245,158,11,0.2);
   stroke-width: 1.5;
-  stroke-dasharray: 82;
-  stroke-dashoffset: 82;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
 }
 
 .sys-wire.active-wire {
@@ -1391,8 +1388,8 @@ section:nth-child(even) {
 .sys-wire-h {
   stroke: rgba(245,158,11,0.12);
   stroke-width: 1;
-  stroke-dasharray: 680;
-  stroke-dashoffset: 680;
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
 }
 
 /* ── Pill nav ── */
@@ -1443,7 +1440,7 @@ section:nth-child(even) {
   cursor: pointer;
   border-radius: 100px;
   white-space: nowrap;
-  transition: color 200ms ease, transform 200ms ease;
+  transition: color 200ms ease;
   -webkit-tap-highlight-color: transparent;
   outline: none;
   opacity: 0;
@@ -1596,9 +1593,9 @@ section:nth-child(even) {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-muted);
-  opacity: 0.4;
+  opacity: 0;
   transition: color 0.2s;
-  will-change: opacity, transform;
+  will-change: opacity, color;
 }
 
 .sys-flow-item.lit {
@@ -1685,11 +1682,13 @@ section:nth-child(even) {
 @media (prefers-reduced-motion: reduce) {
   .sys-hero-title { animation: none; }
   .sys-word { opacity: 1; transform: none; }
-  .sys-wire, .sys-wire-h { stroke-dashoffset: 0; }
+  .sys-wire { stroke-dashoffset: 0; opacity: 0.35; }
+  .sys-wire-h { stroke-dashoffset: 0; opacity: 0.6; }
   .tab-btn { opacity: 1; transform: none; }
   .tabs-content-wrap { opacity: 1; transform: none; }
   .sys-flow-finale { opacity: 1; transform: none; }
   .sys-flow-result { opacity: 1; transform: none; }
+  .sys-flow-item { opacity: 1; color: var(--accent); }
 }
 
 /* ═══════════════ SCROLL ANIMATIONS ═══════════════ */

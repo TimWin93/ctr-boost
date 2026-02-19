@@ -12,8 +12,8 @@
   var counterNum  = section.querySelector('.tab-counter-num');
   var contentWrap = section.querySelector('.tabs-content-wrap');
   var navEl       = section.querySelector('.tabs-nav');
-  /* exclude .sys-word-break from stagger — it's an invisible line-break */
-  var words       = Array.from(section.querySelectorAll('.sys-word:not(.sys-word-break)'));
+  /* .sys-word spans only — br.sys-word-break has no .sys-word class, naturally excluded */
+  var words       = Array.from(section.querySelectorAll('.sys-word'));
   var wires       = Array.from(section.querySelectorAll('.sys-wire'));
   var wireH       = section.querySelector('.sys-wire-h');
   var flowItems   = Array.from(section.querySelectorAll('.sys-flow-item'));
@@ -80,13 +80,13 @@
     /* horizontal line */
     if (wireH) {
       gsap.fromTo(wireH,
-        { attr: { 'stroke-dashoffset': 680 } },
+        { attr: { 'stroke-dashoffset': 800 } },
         { attr: { 'stroke-dashoffset': 0 }, duration: 0.7, ease: 'power2.inOut' }
       );
     }
     /* vertical lines staggered */
     gsap.fromTo(wires,
-      { attr: { 'stroke-dashoffset': 82 }, opacity: 0 },
+      { attr: { 'stroke-dashoffset': 60 }, opacity: 0 },
       { attr: { 'stroke-dashoffset': 0 }, opacity: 0.35,
         duration: 0.45, stagger: 0.07, ease: 'power2.out', delay: 0.15 }
     );
@@ -123,16 +123,20 @@
   function runFlowFinale() {
     if (reducedMotion || flowDone) return;
     flowDone = true;
+    /* first: reveal all items dimmed, then light them up sequentially */
     var tl = gsap.timeline();
+    tl.to(flowItems,
+      { opacity: 0.35, duration: 0.25, stagger: 0.06, ease: 'power2.out' }
+    );
     flowItems.forEach(function(item, i) {
       tl.to(item,
-        { opacity: 1, color: '#F59E0B', duration: 0.22, ease: 'power2.out' },
-        i * 0.3
+        { opacity: 1, color: '#F59E0B', duration: 0.28, ease: 'power2.out' },
+        0.3 + i * 0.28
       );
     });
     tl.to(flowResult,
       { opacity: 1, y: 0, duration: 0.38, ease: 'power3.out' },
-      '+=0.12'
+      '+=0.1'
     );
   }
 
@@ -271,7 +275,7 @@
     gsap.set(contentWrap, { opacity: 1, y: 0 });
     gsap.set(flowFinale, { opacity: 1, y: 0 });
     gsap.set(flowResult, { opacity: 1, y: 0 });
-    if (wireH) gsap.set(wireH, { attr: { 'stroke-dashoffset': 0 } });
+    if (wireH) gsap.set(wireH, { attr: { 'stroke-dashoffset': 0 }, opacity: 0.6 });
     wires.forEach(function(w) { gsap.set(w, { attr: { 'stroke-dashoffset': 0 }, opacity: 0.35 }); });
     /* blob after layout */
     requestAnimationFrame(function() {
@@ -280,7 +284,7 @@
     });
     /* show flow finale items immediately */
     gsap.set(flowItems, { opacity: 1, color: '#F59E0B' });
-    gsap.set(flowResult, { opacity: 1, y: 0 });
+    gsap.set(flowResult, { opacity: 1, y: 0, clearProps: 'transform' });
     flowDone = true;
   }
 
