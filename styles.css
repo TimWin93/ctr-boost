@@ -1290,6 +1290,269 @@ section:nth-child(even) {
   .flow-step { font-size: 12px; padding: 8px 14px; }
 }
 
+/* ═══════════════ TABS SECTION ═══════════════ */
+
+.tabs-section {
+  background: var(--bg-dark);
+}
+
+/* Nav wrap */
+.tabs-nav-wrap {
+  margin-top: 48px;
+  overflow: hidden;
+}
+
+.tabs-nav {
+  position: relative;
+  display: inline-flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  width: 100%;
+}
+
+.tab-btn {
+  position: relative;
+  padding: 14px 28px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 150ms ease, transform 150ms ease, font-weight 150ms ease;
+  white-space: nowrap;
+  z-index: 1;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.tab-btn:hover {
+  color: var(--text-secondary);
+  transform: translateY(-1px);
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+.tab-btn.active {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Animated underline slider */
+.tabs-underline {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+  pointer-events: none;
+  will-change: transform, width;
+}
+
+/* Content area */
+.tabs-content-wrap {
+  position: relative;
+  min-height: 220px;
+  margin-top: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 36px 40px 40px;
+  overflow: hidden;
+}
+
+/* Counter 01/04 */
+.tab-counter {
+  position: absolute;
+  top: 28px;
+  right: 36px;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.tab-counter-num {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.tab-counter-sep {
+  opacity: 0.4;
+  font-size: 15px;
+}
+
+.tab-counter-total {
+  font-size: 14px;
+  opacity: 0.5;
+}
+
+/* Panels */
+.tab-panel {
+  display: none;
+  opacity: 0;
+}
+
+.tab-panel.active {
+  display: block;
+  opacity: 1;
+}
+
+.tab-panel-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.tab-panel-desc {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.tab-bullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tab-bullets li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.tab-bullets li::before {
+  content: '—';
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Mechanism progress bar */
+.tabs-mechanism {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  width: fit-content;
+}
+
+.mech-seg {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  opacity: 0.4;
+  transition: none;
+  letter-spacing: 0.02em;
+  cursor: default;
+}
+
+.mech-seg.active {
+  color: var(--accent);
+  opacity: 1;
+}
+
+.mech-arrow {
+  font-size: 11px;
+  color: var(--border);
+  opacity: 0.6;
+}
+
+/* Footer */
+.tabs-footer {
+  margin-top: 32px;
+  padding: 28px 36px;
+  background: linear-gradient(135deg, rgba(245,158,11,0.05) 0%, rgba(245,158,11,0.02) 100%);
+  border: 1px solid rgba(245,158,11,0.15);
+  border-radius: var(--radius);
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.tabs-footer-flow {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Entrance initial states (JS will drive these with GSAP) */
+.tabs-entrance-label,
+.tabs-entrance-title,
+.tabs-entrance-sub {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.tab-btn {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.tabs-content-wrap {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .tabs-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs-nav::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    padding: 12px 18px;
+    font-size: 14px;
+  }
+
+  .tabs-content-wrap {
+    padding: 28px 20px 28px;
+  }
+
+  .tab-counter {
+    top: 20px;
+    right: 20px;
+  }
+
+  .tabs-mechanism {
+    flex-wrap: wrap;
+    border-radius: 12px;
+    gap: 4px;
+  }
+
+  .tabs-footer {
+    padding: 20px 20px;
+  }
+}
+
 /* ═══════════════ SCROLL ANIMATIONS ═══════════════ */
 
 /* Базовые состояния для элементов до появления */
