@@ -1290,55 +1290,136 @@ section:nth-child(even) {
   .flow-step { font-size: 12px; padding: 8px 14px; }
 }
 
-/* ═══════════════ TABS SECTION ═══════════════ */
+/* ═══════════════ TABS SECTION — PREMIUM v4 ═══════════════ */
 
 .tabs-section {
   background: var(--bg-dark);
+  padding-top: 80px;
+  padding-bottom: 100px;
 }
 
-/* Entrance initial states — GSAP animates in */
-.tabs-entrance-label,
-.tabs-entrance-title,
-.tabs-entrance-sub {
+/* ── Hero title ── */
+.sys-hero-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(36px, 5.5vw, 64px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin-bottom: 0;
+  /* gradient text */
+  background: linear-gradient(
+    135deg,
+    #F5F5F7 0%,
+    #F59E0B 35%,
+    #FBBF24 50%,
+    #F5F5F7 65%,
+    #F59E0B 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* shimmer animation */
+  animation: sys-shimmer 10s linear infinite;
+}
+
+@keyframes sys-shimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.sys-word {
+  display: inline-block;
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(40px);
+  will-change: transform, opacity;
 }
 
-/* ── Pill nav container ── */
+.sys-word-break {
+  display: block;
+  height: 0;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.sys-word-accent {
+  /* extra warm tint on last word */
+  filter: drop-shadow(0 0 24px rgba(245,158,11,0.35));
+}
+
+/* ── SVG wires ── */
+.sys-wires-wrap {
+  width: 100%;
+  height: 60px;
+  margin-top: 16px;
+  margin-bottom: 0;
+  overflow: visible;
+}
+
+.sys-wires {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sys-wire {
+  stroke: rgba(245,158,11,0.18);
+  stroke-width: 1;
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+  transition: none;
+}
+
+.sys-wire.active-wire {
+  stroke: rgba(245,158,11,0.7);
+  filter: drop-shadow(0 0 3px rgba(245,158,11,0.5));
+}
+
+.sys-wire-h {
+  stroke: rgba(245,158,11,0.1);
+  stroke-width: 1;
+  stroke-dasharray: 700;
+  stroke-dashoffset: 700;
+}
+
+/* ── Pill nav ── */
 .tabs-nav-wrap {
-  margin-top: 48px;
+  margin-top: 0;
 }
 
 .tabs-nav {
   position: relative;
   display: inline-flex;
-  gap: 4px;
-  padding: 5px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
+  gap: 6px;
+  padding: 6px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 100px;
   max-width: 100%;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-/* Blob indicator — animated by GSAP, sits behind buttons */
 .tabs-blob {
   position: absolute;
-  top: 5px;
-  left: 5px;
-  height: calc(100% - 10px);
+  top: 6px;
+  left: 6px;
+  height: calc(100% - 12px);
   border-radius: 100px;
-  background: linear-gradient(135deg, rgba(245,158,11,0.24) 0%, rgba(251,191,36,0.14) 100%);
-  box-shadow: 0 0 20px rgba(245,158,11,0.16);
+  background: linear-gradient(135deg, rgba(245,158,11,0.26) 0%, rgba(251,191,36,0.15) 100%);
+  box-shadow: 0 0 22px rgba(245,158,11,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
   pointer-events: none;
   will-change: transform, width;
   z-index: 0;
 }
 
-/* ── Tab buttons ── */
 .tab-btn {
   position: relative;
   z-index: 1;
-  padding: 10px 22px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
   background: none;
   border: none;
   color: var(--text-muted);
@@ -1349,16 +1430,16 @@ section:nth-child(even) {
   cursor: pointer;
   border-radius: 100px;
   white-space: nowrap;
-  transition: color 200ms ease;
+  transition: color 200ms ease, transform 200ms ease;
   -webkit-tap-highlight-color: transparent;
   outline: none;
-  /* entrance handled by GSAP */
   opacity: 0;
   transform: translateY(10px);
 }
 
 .tab-btn:hover {
   color: var(--text-secondary);
+  transform: translateY(-3px) scale(1.02);
 }
 
 .tab-btn:focus-visible {
@@ -1371,22 +1452,53 @@ section:nth-child(even) {
   font-weight: 700;
 }
 
+.tab-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: transform 0.35s ease;
+}
+
+.tab-btn.active .tab-icon {
+  transform: rotate(8deg) scale(1.1);
+}
+
 /* ── Content panel ── */
 .tabs-content-wrap {
   position: relative;
   min-height: 180px;
-  margin-top: 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  margin-top: 10px;
+  background: rgba(26,26,30,0.8);
+  border: 1px solid rgba(255,255,255,0.07);
   border-radius: var(--radius);
   padding: 36px 40px 40px;
   overflow: hidden;
-  /* entrance */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   opacity: 0;
   transform: translateY(12px);
 }
 
-/* ── Counter 01/04 ── */
+/* sweep div injected by JS */
+.tabs-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.07) 50%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform, opacity;
+}
+
+.tab-panel,
+.tab-counter {
+  position: relative;
+  z-index: 1;
+}
+
+/* Counter */
 .tab-counter {
   position: absolute;
   top: 28px;
@@ -1406,28 +1518,12 @@ section:nth-child(even) {
   display: inline-block;
 }
 
-.tab-counter-sep {
-  font-size: 14px;
-  color: var(--text-muted);
-  opacity: 0.4;
-}
+.tab-counter-sep { font-size: 14px; color: var(--text-muted); opacity: 0.4; }
+.tab-counter-total { font-size: 13px; color: var(--text-muted); opacity: 0.45; }
 
-.tab-counter-total {
-  font-size: 13px;
-  color: var(--text-muted);
-  opacity: 0.45;
-}
-
-/* ── Panels ── */
-.tab-panel {
-  display: none;
-  opacity: 0;
-}
-
-.tab-panel.active {
-  display: block;
-  opacity: 1;
-}
+/* Panels */
+.tab-panel { display: none; opacity: 0; }
+.tab-panel.active { display: block; opacity: 1; }
 
 .tab-panel-desc {
   font-size: 16px;
@@ -1463,10 +1559,61 @@ section:nth-child(even) {
   opacity: 0.8;
 }
 
+/* ── Flow finale ── */
+.sys-flow-finale {
+  margin-top: 20px;
+  padding: 20px 24px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.sys-flow-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sys-flow-item {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.4;
+  transition: color 0.2s;
+  will-change: opacity, transform;
+}
+
+.sys-flow-item.lit {
+  color: var(--accent);
+  opacity: 1;
+}
+
+.sys-flow-arrow {
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.25;
+}
+
+.sys-flow-result {
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+  opacity: 0;
+  transform: translateY(6px);
+  will-change: opacity, transform;
+}
+
 /* ── Footer ── */
 .tabs-footer {
-  margin-top: 24px;
-  padding: 24px 32px;
+  margin-top: 20px;
+  padding: 22px 28px;
   background: linear-gradient(135deg, rgba(245,158,11,0.05) 0%, rgba(245,158,11,0.02) 100%);
   border: 1px solid rgba(245,158,11,0.12);
   border-radius: var(--radius);
@@ -1482,115 +1629,54 @@ section:nth-child(even) {
   color: var(--text-muted);
 }
 
-/* ── Word spans for stagger entrance ── */
-.tabs-entrance-title .word {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(16px);
-  will-change: transform, opacity;
-}
-
-/* Permanent soft glow on "CTR" word */
-.word-glow {
-  text-shadow: 0 0 28px rgba(245,158,11,0.45), 0 0 8px rgba(245,158,11,0.2);
-}
-
-/* ── Glow sweep div (injected by JS) ── */
-.tabs-sweep {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 55%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(245,158,11,0.07) 50%,
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: 0;
-  will-change: transform, opacity;
-}
-
-/* All panel content sits above ::before */
-.tab-panel,
-.tab-counter {
-  position: relative;
-  z-index: 1;
-}
-
-/* ── Mechanism chips ── */
-.mech-chips {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
-
-.mech-chip {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  padding: 5px 12px;
-  border-radius: 100px;
-  border: 1px solid rgba(255,255,255,0.07);
-  background: rgba(255,255,255,0.03);
-  opacity: 0.45;
-  transition: color 0.2s;
-  cursor: default;
-  /* GSAP controls opacity/scale */
-  will-change: transform, opacity;
-}
-
-.mech-chip.active {
-  color: var(--accent);
-  border-color: rgba(245,158,11,0.25);
-  background: rgba(245,158,11,0.08);
-  opacity: 1;
-}
-
-.mech-chip-arrow {
-  font-size: 10px;
-  color: var(--text-muted);
-  opacity: 0.3;
-}
-
 /* ── Responsive ── */
 @media (max-width: 700px) {
+  .sys-hero-title { font-size: clamp(28px, 8vw, 40px); }
+
+  .sys-wires-wrap { height: 40px; }
+
   .tabs-nav {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     scroll-snap-type: x mandatory;
     border-radius: 20px;
+    gap: 2px;
+    padding: 4px;
   }
   .tabs-nav::-webkit-scrollbar { display: none; }
 
   .tab-btn {
-    padding: 9px 16px;
+    padding: 8px 14px;
     font-size: 13px;
     scroll-snap-align: start;
+    gap: 5px;
   }
+
+  .tab-icon svg { width: 14px; height: 14px; }
 
   .tabs-content-wrap {
     padding: 24px 20px 28px;
     min-height: 160px;
   }
 
-  .tab-counter {
-    top: 18px;
-    right: 18px;
-  }
-
+  .tab-counter { top: 18px; right: 18px; }
   .tab-counter-num { font-size: 18px; }
 
-  .tabs-footer {
-    padding: 18px 18px;
-  }
+  .tabs-footer { padding: 16px 16px; }
+
+  .sys-flow-row { gap: 5px; }
+  .sys-flow-item { font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sys-hero-title { animation: none; }
+  .sys-word { opacity: 1; transform: none; }
+  .sys-wire, .sys-wire-h { stroke-dashoffset: 0; }
+  .tab-btn { opacity: 1; transform: none; }
+  .tabs-content-wrap { opacity: 1; transform: none; }
+  .sys-flow-finale { opacity: 1; transform: none; }
+  .sys-flow-result { opacity: 1; transform: none; }
 }
 
 /* ═══════════════ SCROLL ANIMATIONS ═══════════════ */

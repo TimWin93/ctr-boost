@@ -184,25 +184,71 @@
 <!-- ═══════════════ BLOCK 3.5: СИСТЕМА РОСТА CTR (TABS) ═══════════════ -->
 <section class="tabs-section" id="system">
   <div class="container">
-    <div class="section-label tabs-entrance-label">⚙️ Система</div>
-    <h2 class="section-title tabs-entrance-title">
-      <span class="word">Из</span>
-      <span class="word">чего</span>
-      <span class="word">состоит</span><br>
-      <span class="word">система</span>
-      <span class="word">роста</span>
-      <span class="word accent word-glow">CTR</span>
-    </h2>
-    <p class="section-subtitle tabs-entrance-sub">4 части. Один механизм. Работают только вместе.</p>
 
-    <!-- Tabs nav — pill style -->
+    <!-- HERO TITLE — no badge, full-width -->
+    <h2 class="sys-hero-title">
+      <span class="sys-word">4&nbsp;части.</span>
+      <span class="sys-word">Один&nbsp;механизм.</span>
+      <span class="sys-word sys-word-break"><br></span>
+      <span class="sys-word">Работают</span>
+      <span class="sys-word">только</span>
+      <span class="sys-word sys-word-accent">вместе.</span>
+    </h2>
+
+    <!-- SVG engineering lines connecting title to tabs -->
+    <div class="sys-wires-wrap" aria-hidden="true">
+      <svg class="sys-wires" viewBox="0 0 900 80" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 4 vertical drop lines, one per tab -->
+        <line class="sys-wire" data-idx="0" x1="112" y1="0" x2="112" y2="80"/>
+        <line class="sys-wire" data-idx="1" x1="300" y1="0" x2="300" y2="80"/>
+        <line class="sys-wire" data-idx="2" x1="563" y1="0" x2="563" y2="80"/>
+        <line class="sys-wire" data-idx="3" x1="788" y1="0" x2="788" y2="80"/>
+        <!-- horizontal connector at top -->
+        <line class="sys-wire-h" x1="112" y1="0" x2="788" y2="0"/>
+      </svg>
+    </div>
+
+    <!-- Tabs nav — pill cards with icons -->
     <div class="tabs-nav-wrap">
       <div class="tabs-nav" role="tablist" aria-label="Части системы">
         <div class="tabs-blob" aria-hidden="true"></div>
-        <button class="tab-btn active" role="tab" aria-selected="true"  aria-controls="tab-panel-0" data-index="0">Стратегия</button>
-        <button class="tab-btn"        role="tab" aria-selected="false" aria-controls="tab-panel-1" data-index="1">Смысл</button>
-        <button class="tab-btn"        role="tab" aria-selected="false" aria-controls="tab-panel-2" data-index="2">Аналитика</button>
-        <button class="tab-btn"        role="tab" aria-selected="false" aria-controls="tab-panel-3" data-index="3">Технология</button>
+
+        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-panel-0" data-index="0">
+          <span class="tab-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+            </svg>
+          </span>
+          Стратегия
+        </button>
+
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-panel-1" data-index="1">
+          <span class="tab-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 4 12.9V17H8v-2.1A7 7 0 0 1 12 2z"/>
+            </svg>
+          </span>
+          Смысл
+        </button>
+
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-panel-2" data-index="2">
+          <span class="tab-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-8"/>
+            </svg>
+          </span>
+          Аналитика
+        </button>
+
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-panel-3" data-index="3">
+          <span class="tab-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/>
+            </svg>
+          </span>
+          Технология
+        </button>
       </div>
     </div>
 
@@ -250,22 +296,26 @@
       </div>
     </div>
 
-    <!-- Mechanism chips -->
-    <div class="mech-chips" aria-hidden="true">
-      <span class="mech-chip active" data-index="0">Стратегия</span>
-      <span class="mech-chip-arrow">→</span>
-      <span class="mech-chip" data-index="1">Смысл</span>
-      <span class="mech-chip-arrow">→</span>
-      <span class="mech-chip" data-index="2">Аналитика</span>
-      <span class="mech-chip-arrow">→</span>
-      <span class="mech-chip" data-index="3">Технология</span>
+    <!-- Flow finale -->
+    <div class="sys-flow-finale" aria-hidden="true">
+      <div class="sys-flow-row">
+        <span class="sys-flow-item" data-fidx="0">Стратегия</span>
+        <span class="sys-flow-arrow">→</span>
+        <span class="sys-flow-item" data-fidx="1">Смысл</span>
+        <span class="sys-flow-arrow">→</span>
+        <span class="sys-flow-item" data-fidx="2">Аналитика</span>
+        <span class="sys-flow-arrow">→</span>
+        <span class="sys-flow-item" data-fidx="3">Технология</span>
+      </div>
+      <div class="sys-flow-result">→ Рост CTR</div>
     </div>
 
-    <!-- Unifying footer -->
+    <!-- Footer tagline -->
     <div class="tabs-footer">
       <p>По отдельности это инструменты. Вместе — система.<br>
       <span class="tabs-footer-flow">Стратегия задаёт направление → смысл забирает клик → аналитика подтверждает → технология ускоряет цикл.</span></p>
     </div>
+
   </div>
 </section>
 

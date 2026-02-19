@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════
-   TABS SYSTEM — GSAP PRO v3 (pill/blob + glow sweep + word stagger + chips)
-═══════════════════════════════════════════════ */
+   TABS SYSTEM — GSAP PRO v4 (Apple-style premium)
+════════════════════════════════════════════════ */
 
 (function() {
   var section      = document.querySelector('.tabs-section');
@@ -12,32 +12,30 @@
   var counterNum   = section.querySelector('.tab-counter-num');
   var contentWrap  = section.querySelector('.tabs-content-wrap');
   var navEl        = section.querySelector('.tabs-nav');
-  var words        = Array.from(section.querySelectorAll('.tabs-entrance-title .word'));
-  var chips        = Array.from(section.querySelectorAll('.mech-chip'));
-  var sweepEl      = contentWrap; /* ::before sweep driven via custom CSS var trick — see below */
+  var words        = Array.from(section.querySelectorAll('.sys-word:not(.sys-word-break)'));
+  var wires        = Array.from(section.querySelectorAll('.sys-wire'));
+  var wireH        = section.querySelector('.sys-wire-h');
+  var flowItems    = Array.from(section.querySelectorAll('.sys-flow-item'));
+  var flowResult   = section.querySelector('.sys-flow-result');
+  var flowFinale   = section.querySelector('.sys-flow-finale');
 
   var currentIndex  = 0;
   var isAnimating   = false;
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var isMobile      = window.matchMedia('(max-width: 700px)').matches;
 
-  /* ══════════════════════════════
-     BLOB helpers
-  ══════════════════════════════ */
+  /* ── Blob ── */
   function getBlobTarget(btn) {
     var nr = navEl.getBoundingClientRect();
     var br = btn.getBoundingClientRect();
-    return { x: br.left - nr.left - 5, w: br.width };
+    return { x: br.left - nr.left - 6, w: br.width };
   }
-
   function setBlobInstant(btn) {
     var t = getBlobTarget(btn);
     gsap.set(blob, { x: t.x, width: t.w });
   }
 
-  /* ══════════════════════════════
-     COUNTER
-  ══════════════════════════════ */
+  /* ── Counter ── */
   function animateCounter(idx) {
     var label = String(idx + 1).padStart(2, '0');
     if (reducedMotion) { counterNum.textContent = label; return; }
@@ -45,68 +43,57 @@
       opacity: 0, y: -6, duration: 0.14, ease: 'power2.in',
       onComplete: function() {
         counterNum.textContent = label;
-        gsap.fromTo(counterNum,
-          { opacity: 0, y: 8 },
-          { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' }
-        );
+        gsap.fromTo(counterNum, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' });
       }
     });
   }
 
-  /* ══════════════════════════════
-     MECHANISM CHIPS
-  ══════════════════════════════ */
-  function setChipActive(idx) {
-    chips.forEach(function(chip, i) {
-      chip.classList.toggle('active', i === idx);
-      if (reducedMotion) return;
+  /* ── Wires: highlight active wire ── */
+  function setWireActive(idx) {
+    if (reducedMotion) return;
+    wires.forEach(function(w, i) {
       if (i === idx) {
-        gsap.fromTo(chip,
-          { scale: 1, opacity: 0.45 },
-          { scale: 1.04, opacity: 1, duration: 0.25, ease: 'power2.out',
-            onComplete: function() { gsap.to(chip, { scale: 1, duration: 0.15 }); }
-          }
-        );
+        w.classList.add('active-wire');
+        gsap.fromTo(w, { opacity: 0.3 }, { opacity: 1, duration: 0.4, ease: 'power2.out' });
       } else {
-        gsap.to(chip, { opacity: 0.45, duration: 0.2 });
+        w.classList.remove('active-wire');
+        gsap.to(w, { opacity: 0.4, duration: 0.3 });
       }
     });
   }
 
-  /* ══════════════════════════════
-     GLOW SWEEP (::before via pseudo-wrapper)
-     We animate a real div overlay instead of ::before
-     for full GSAP control
-  ══════════════════════════════ */
+  /* ── Sweep div ── */
   var sweepDiv = document.createElement('div');
   sweepDiv.className = 'tabs-sweep';
   contentWrap.insertBefore(sweepDiv, contentWrap.firstChild);
+  gsap.set(sweepDiv, { opacity: 0 });
 
-  function runSweep() {
+  function runSweep(fast) {
     if (reducedMotion) return;
+    var dur = fast ? 0.6 : 0.9;
     gsap.fromTo(sweepDiv,
-      { x: '-100%', opacity: 1 },
-      { x: '160%', opacity: 1, duration: 0.9, ease: 'power2.inOut',
+      { x: '-100%', opacity: fast ? 0.7 : 1 },
+      { x: '160%', opacity: fast ? 0.7 : 1, duration: dur, ease: 'power2.inOut',
         onComplete: function() { gsap.set(sweepDiv, { opacity: 0 }); }
       }
     );
   }
 
-  /* subtle hover sweep */
   if (!isMobile && !reducedMotion) {
-    contentWrap.addEventListener('mouseenter', function() {
-      gsap.fromTo(sweepDiv,
-        { x: '-60%', opacity: 0.7 },
-        { x: '160%', opacity: 0.7, duration: 1.1, ease: 'power1.inOut',
-          onComplete: function() { gsap.set(sweepDiv, { opacity: 0 }); }
-        }
-      );
-    });
+    contentWrap.addEventListener('mouseenter', function() { runSweep(true); });
   }
 
-  /* ══════════════════════════════
-     SWITCH TAB
-  ══════════════════════════════ */
+  /* ── Flow finale animation ── */
+  function runFlowFinale() {
+    if (reducedMotion) return;
+    var tl = gsap.timeline();
+    flowItems.forEach(function(item, i) {
+      tl.to(item, { opacity: 1, color: 'var(--accent)', duration: 0.22, ease: 'power2.out' }, i * 0.28);
+    });
+    tl.to(flowResult, { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' }, '+=0.1');
+  }
+
+  /* ── Switch tab ── */
   function switchTab(newIdx) {
     if (newIdx === currentIndex || isAnimating) return;
     isAnimating = true;
@@ -122,69 +109,55 @@
 
     currentIndex = newIdx;
     animateCounter(newIdx);
-    setChipActive(newIdx);
+    setWireActive(newIdx);
 
-    /* ── Reduced motion ── */
+    /* icon rotate on new active tab */
+    if (!reducedMotion) {
+      var icon = newBtn.querySelector('.tab-icon');
+      if (icon) gsap.fromTo(icon, { rotation: -8 }, { rotation: 8, duration: 0.35, ease: 'power2.out',
+        onComplete: function() { gsap.to(icon, { rotation: 0, duration: 0.2 }); }
+      });
+    }
+
     if (reducedMotion) {
-      oldPanel.classList.remove('active');
-      oldPanel.style.display = 'none';
-      newPanel.style.display = 'block';
-      newPanel.classList.add('active');
+      oldPanel.classList.remove('active'); oldPanel.style.display = 'none';
+      newPanel.style.display = 'block'; newPanel.classList.add('active');
       gsap.set(newPanel, { opacity: 1, y: 0, clearProps: 'filter' });
       setBlobInstant(newBtn);
       isAnimating = false;
       return;
     }
 
-    /* Blob morph */
+    /* blob morph */
     var t = getBlobTarget(newBtn);
     gsap.to(blob, {
-      x: t.x, width: t.w * 1.06, duration: 0.3, ease: 'power3.out',
-      onComplete: function() {
-        gsap.to(blob, { width: t.w, duration: 0.2, ease: 'power2.out' });
-      }
+      x: t.x, width: t.w * 1.06, duration: 0.32, ease: 'power3.out',
+      onComplete: function() { gsap.to(blob, { width: t.w, duration: 0.2, ease: 'power2.out' }); }
     });
 
-    /* Active tab pulse */
-    gsap.fromTo(newBtn, { scale: 0.97 }, { scale: 1, duration: 0.2, ease: 'power2.out' });
+    /* pulse */
+    gsap.fromTo(newBtn, { scale: 0.96 }, { scale: 1, duration: 0.22, ease: 'power2.out' });
 
-    /* Old panel out */
+    /* old out */
     gsap.to(oldPanel, {
-      opacity: 0, y: -6, filter: 'blur(3px)',
-      duration: 0.18, ease: 'power2.in',
+      opacity: 0, y: -6, filter: 'blur(3px)', duration: 0.18, ease: 'power2.in',
       onComplete: function() {
-        oldPanel.classList.remove('active');
-        oldPanel.style.display = 'none';
+        oldPanel.classList.remove('active'); oldPanel.style.display = 'none';
         gsap.set(oldPanel, { opacity: 0, y: 0, clearProps: 'filter' });
 
-        /* New panel in */
-        newPanel.style.display = 'block';
-        newPanel.classList.add('active');
+        newPanel.style.display = 'block'; newPanel.classList.add('active');
         gsap.fromTo(newPanel,
           { opacity: 0, y: 10, filter: 'blur(6px)' },
-          { opacity: 1, y: 0, filter: 'blur(0px)',
-            duration: 0.32, ease: 'power3.out',
-            onComplete: function() {
-              gsap.set(newPanel, { clearProps: 'filter' });
-              isAnimating = false;
-            }
+          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.32, ease: 'power3.out',
+            onComplete: function() { gsap.set(newPanel, { clearProps: 'filter' }); isAnimating = false; }
           }
         );
-
-        /* mini sweep on each switch */
-        gsap.fromTo(sweepDiv,
-          { x: '-100%', opacity: 0.8 },
-          { x: '160%', opacity: 0.8, duration: 0.7, ease: 'power2.out',
-            onComplete: function() { gsap.set(sweepDiv, { opacity: 0 }); }
-          }
-        );
+        runSweep(true);
       }
     });
   }
 
-  /* ══════════════════════════════
-     CLICK + KEYBOARD
-  ══════════════════════════════ */
+  /* ── Clicks + keyboard ── */
   tabBtns.forEach(function(btn, i) {
     btn.id = 'tab-btn-' + i;
     btn.addEventListener('click', function() { switchTab(i); });
@@ -192,91 +165,77 @@
 
   navEl.addEventListener('keydown', function(e) {
     var total = tabBtns.length;
-    if (e.key === 'ArrowRight') {
-      e.preventDefault();
-      var next = (currentIndex + 1) % total;
-      switchTab(next); tabBtns[next].focus();
-    }
-    if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-      var prev = (currentIndex - 1 + total) % total;
-      switchTab(prev); tabBtns[prev].focus();
-    }
+    if (e.key === 'ArrowRight') { e.preventDefault(); var n = (currentIndex+1)%total; switchTab(n); tabBtns[n].focus(); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); var p = (currentIndex-1+total)%total; switchTab(p); tabBtns[p].focus(); }
     if (e.key === 'Home') { e.preventDefault(); switchTab(0); tabBtns[0].focus(); }
-    if (e.key === 'End')  { e.preventDefault(); switchTab(total - 1); tabBtns[total - 1].focus(); }
+    if (e.key === 'End')  { e.preventDefault(); switchTab(total-1); tabBtns[total-1].focus(); }
   });
 
-  /* ══════════════════════════════
-     MAGNETIC HOVER (desktop only)
-  ══════════════════════════════ */
+  /* ── Magnetic hover ── */
   if (!isMobile && !reducedMotion) {
     tabBtns.forEach(function(btn) {
       var qx = gsap.quickTo(btn, 'x', { duration: 0.28, ease: 'power2.out' });
       var qy = gsap.quickTo(btn, 'y', { duration: 0.28, ease: 'power2.out' });
       btn.addEventListener('mousemove', function(e) {
         var r = btn.getBoundingClientRect();
-        qx((e.clientX - r.left - r.width  / 2) * 0.2);
-        qy((e.clientY - r.top  - r.height / 2) * 0.28);
+        qx((e.clientX - r.left - r.width/2) * 0.2);
+        qy((e.clientY - r.top  - r.height/2) * 0.28);
       });
       btn.addEventListener('mouseleave', function() { qx(0); qy(0); });
     });
   }
 
-  /* ══════════════════════════════
-     ENTRANCE — showAll (instant)
-  ══════════════════════════════ */
+  /* ── showAll (instant fallback) ── */
   function showAll() {
-    gsap.set(section.querySelector('.tabs-entrance-label'), { opacity: 1, y: 0 });
     gsap.set(words, { opacity: 1, y: 0 });
-    gsap.set(section.querySelector('.tabs-entrance-sub'), { opacity: 1, y: 0 });
-    gsap.set(tabBtns, { opacity: 1, y: 0 });
+    gsap.set(tabBtns, { opacity: 1, y: 0, transform: 'none' });
     gsap.set(contentWrap, { opacity: 1, y: 0 });
+    gsap.set(flowFinale, { opacity: 1, y: 0 });
+    gsap.set(flowResult, { opacity: 1, y: 0 });
+    if (wireH) gsap.set(wireH, { strokeDashoffset: 0 });
+    wires.forEach(function(w) { gsap.set(w, { strokeDashoffset: 0, opacity: 1 }); });
     setBlobInstant(tabBtns[0]);
-    setChipActive(0);
+    setWireActive(0);
   }
 
-  /* ══════════════════════════════
-     ENTRANCE — animated
-  ══════════════════════════════ */
+  /* ── Entrance animation ── */
   function runEntrance() {
     if (reducedMotion) { showAll(); return; }
 
     var tl = gsap.timeline({
-      scrollTrigger: { trigger: section, start: 'top 75%', once: true }
+      scrollTrigger: { trigger: section, start: 'top 72%', once: true }
     });
 
-    tl.to(section.querySelector('.tabs-entrance-label'),
-        { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' })
+    /* words stagger */
+    tl.to(words, { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power4.out' })
 
-      /* word stagger */
-      .to(words,
-        { opacity: 1, y: 0, duration: 0.38, stagger: 0.07, ease: 'power3.out' }, '-=0.28')
+    /* draw horizontal wire */
+    .to(wireH, { strokeDashoffset: 0, duration: 0.6, ease: 'power2.inOut' }, '-=0.2')
 
-      .to(section.querySelector('.tabs-entrance-sub'),
-        { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, '-=0.2')
+    /* draw vertical wires stagger */
+    .to(wires, { strokeDashoffset: 0, duration: 0.4, stagger: 0.08, ease: 'power2.inOut' }, '-=0.35')
 
-      /* pill nav stagger */
-      .to(tabBtns,
-        { opacity: 1, y: 0, duration: 0.3, stagger: 0.06, ease: 'power3.out' }, '-=0.22')
+    /* tab pills */
+    .to(tabBtns, { opacity: 1, y: 0, duration: 0.3, stagger: 0.06, ease: 'power3.out' }, '-=0.25')
 
-      /* content panel */
-      .to(contentWrap,
-        { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, '-=0.15')
+    /* content */
+    .to(contentWrap, { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, '-=0.2')
 
-      /* after all visible: position blob + sweep */
-      .call(function() {
-        setBlobInstant(tabBtns[0]);
-        setChipActive(0);
-        runSweep();
-      });
+    /* flow finale */
+    .to(flowFinale, { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' }, '-=0.1')
+
+    .call(function() {
+      setBlobInstant(tabBtns[0]);
+      setWireActive(0);
+      runSweep(false);
+      /* run flow finale lights with delay */
+      gsap.delayedCall(0.6, runFlowFinale);
+    });
   }
 
-  /* ══════════════════════════════
-     INIT
-  ══════════════════════════════ */
+  /* ── Init ── */
   panels[0].style.display = 'block';
   gsap.set(panels[0], { opacity: 1 });
-  gsap.set(sweepDiv, { opacity: 0 });
   counterNum.textContent = '01';
 
   if (typeof ScrollTrigger !== 'undefined') {
@@ -285,7 +244,7 @@
     showAll();
   }
 
-  /* resize → recalculate blob */
+  /* resize */
   var resizeTimer;
   window.addEventListener('resize', function() {
     clearTimeout(resizeTimer);
