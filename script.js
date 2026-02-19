@@ -1,15 +1,14 @@
 /* ═══════════════════════════════════════════════
-   TABS SYSTEM — GSAP PRO
+   TABS SYSTEM — GSAP PRO (pill / blob)
 ═══════════════════════════════════════════════ */
 
 (function() {
   var section       = document.querySelector('.tabs-section');
   if (!section) return;
 
-  var tabBtns       = section.querySelectorAll('.tab-btn');
-  var panels        = section.querySelectorAll('.tab-panel');
-  var underline     = section.querySelector('.tabs-underline');
-  var mechSegs      = section.querySelectorAll('.mech-seg');
+  var tabBtns       = Array.from(section.querySelectorAll('.tab-btn'));
+  var panels        = Array.from(section.querySelectorAll('.tab-panel'));
+  var blob          = section.querySelector('.tabs-blob');
   var counterNum    = section.querySelector('.tab-counter-num');
   var contentWrap   = section.querySelector('.tabs-content-wrap');
   var navEl         = section.querySelector('.tabs-nav');
@@ -19,16 +18,16 @@
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var isMobile      = window.matchMedia('(max-width: 700px)').matches;
 
-  /* ── Helpers ── */
-  function getUnderlineTarget(btn) {
+  /* ── Blob position helper ── */
+  function getBlobTarget(btn) {
     var nr = navEl.getBoundingClientRect();
     var br = btn.getBoundingClientRect();
-    return { x: br.left - nr.left, w: br.width };
+    return { x: br.left - nr.left - 5, w: br.width }; /* -5 accounts for nav padding */
   }
 
-  function setUnderlineInstant(btn) {
-    var t = getUnderlineTarget(btn);
-    gsap.set(underline, { x: t.x, width: t.w });
+  function setBlobInstant(btn) {
+    var t = getBlobTarget(btn);
+    gsap.set(blob, { x: t.x, width: t.w });
   }
 
   /* ── Counter animation ── */
@@ -39,26 +38,10 @@
       opacity: 0, y: -6, duration: 0.14, ease: 'power2.in',
       onComplete: function() {
         counterNum.textContent = label;
-        gsap.fromTo(counterNum, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' });
-      }
-    });
-  }
-
-  /* ── Mechanism bar ── */
-  function setMechActive(idx) {
-    mechSegs.forEach(function(seg, i) {
-      if (reducedMotion) {
-        seg.classList.toggle('active', i === idx);
-        return;
-      }
-      if (i === idx) {
-        seg.classList.add('active');
-        gsap.fromTo(seg, { opacity: 0.4 }, { opacity: 1, scale: 1.05, duration: 0.25, ease: 'power2.out',
-          onComplete: function() { gsap.set(seg, { scale: 1 }); }
-        });
-      } else {
-        gsap.to(seg, { opacity: 0.4, duration: 0.2 });
-        seg.classList.remove('active');
+        gsap.fromTo(counterNum,
+          { opacity: 0, y: 8 },
+          { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' }
+        );
       }
     });
   }
@@ -68,12 +51,11 @@
     if (newIdx === currentIndex || isAnimating) return;
     isAnimating = true;
 
-    var oldIdx  = currentIndex;
-    var oldPanel = panels[oldIdx];
+    var oldPanel = panels[currentIndex];
     var newPanel = panels[newIdx];
     var newBtn   = tabBtns[newIdx];
 
-    // Update aria / active classes
+    /* Aria + active class */
     tabBtns.forEach(function(b, i) {
       b.classList.toggle('active', i === newIdx);
       b.setAttribute('aria-selected', i === newIdx ? 'true' : 'false');
@@ -81,47 +63,54 @@
 
     currentIndex = newIdx;
     animateCounter(newIdx);
-    setMechActive(newIdx);
 
+    /* ── Reduced motion: instant switch ── */
     if (reducedMotion) {
       oldPanel.classList.remove('active');
       oldPanel.style.display = 'none';
       newPanel.style.display = 'block';
       newPanel.classList.add('active');
-      gsap.set(newPanel, { opacity: 1, y: 0 });
-      setUnderlineInstant(newBtn);
+      gsap.set(newPanel, { opacity: 1, y: 0, filter: 'blur(0px)' });
+      setBlobInstant(newBtn);
       isAnimating = false;
       return;
     }
 
-    /* Underline morph */
-    var target = getUnderlineTarget(newBtn);
-    // 2-step: overshoot width then settle
-    gsap.to(underline, {
-      x: target.x, width: target.w * 1.04,
-      duration: 0.22, ease: 'power3.out',
+    /* ── Blob morph: move + 2-step width overshoot ── */
+    var target = getBlobTarget(newBtn);
+    gsap.to(blob, {
+      x: target.x,
+      width: target.w * 1.06,
+      duration: 0.3,
+      ease: 'power3.out',
       onComplete: function() {
-        gsap.to(underline, { width: target.w, duration: 0.18, ease: 'power2.out' });
+        gsap.to(blob, { width: target.w, duration: 0.22, ease: 'power2.out' });
       }
     });
 
-    /* Active tab pulse */
-    gsap.fromTo(newBtn, { scale: 0.98 }, { scale: 1, duration: 0.18, ease: 'power2.out' });
+    /* ── Active tab pulse ── */
+    gsap.fromTo(newBtn, { scale: 0.97 }, { scale: 1, duration: 0.2, ease: 'power2.out' });
 
-    /* Old panel out */
+    /* ── Old panel out ── */
     gsap.to(oldPanel, {
-      opacity: 0, y: -6, duration: 0.18, ease: 'power2.in',
+      opacity: 0,
+      y: -6,
+      filter: 'blur(3px)',
+      duration: 0.18,
+      ease: 'power2.in',
       onComplete: function() {
         oldPanel.classList.remove('active');
         oldPanel.style.display = 'none';
-        gsap.set(oldPanel, { opacity: 0, y: 0 });
+        gsap.set(oldPanel, { opacity: 0, y: 0, filter: 'blur(0px)' });
 
-        /* New panel in */
+        /* ── New panel in ── */
         newPanel.style.display = 'block';
         newPanel.classList.add('active');
         gsap.fromTo(newPanel,
-          { opacity: 0, y: 10 },
-          { opacity: 1, y: 0, duration: 0.32, ease: 'power3.out',
+          { opacity: 0, y: 10, filter: 'blur(5px)' },
+          {
+            opacity: 1, y: 0, filter: 'blur(0px)',
+            duration: 0.32, ease: 'power3.out',
             onComplete: function() { isAnimating = false; }
           }
         );
@@ -129,7 +118,7 @@
     });
   }
 
-  /* ── Tab button click ── */
+  /* ── Button click ── */
   tabBtns.forEach(function(btn, i) {
     btn.id = 'tab-btn-' + i;
     btn.addEventListener('click', function() { switchTab(i); });
@@ -138,52 +127,55 @@
   /* ── Keyboard navigation ── */
   navEl.addEventListener('keydown', function(e) {
     var total = tabBtns.length;
-    if (e.key === 'ArrowRight') { e.preventDefault(); switchTab((currentIndex + 1) % total); tabBtns[(currentIndex) % total].focus(); }
-    if (e.key === 'ArrowLeft')  { e.preventDefault(); switchTab((currentIndex - 1 + total) % total); tabBtns[currentIndex].focus(); }
-    if (e.key === 'Home')       { e.preventDefault(); switchTab(0); tabBtns[0].focus(); }
-    if (e.key === 'End')        { e.preventDefault(); switchTab(total - 1); tabBtns[total - 1].focus(); }
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      var next = (currentIndex + 1) % total;
+      switchTab(next);
+      tabBtns[next].focus();
+    }
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      var prev = (currentIndex - 1 + total) % total;
+      switchTab(prev);
+      tabBtns[prev].focus();
+    }
+    if (e.key === 'Home') { e.preventDefault(); switchTab(0); tabBtns[0].focus(); }
+    if (e.key === 'End')  { e.preventDefault(); switchTab(total - 1); tabBtns[total - 1].focus(); }
   });
 
-  /* ── Magnetic hover (desktop, reduced-motion off) ── */
-  if (!isMobile && !reducedMotion && typeof gsap !== 'undefined') {
+  /* ── Magnetic hover (desktop only) ── */
+  if (!isMobile && !reducedMotion) {
     tabBtns.forEach(function(btn) {
-      var qx = gsap.quickTo(btn, 'x', { duration: 0.3, ease: 'power2.out' });
-      var qy = gsap.quickTo(btn, 'y', { duration: 0.3, ease: 'power2.out' });
-
+      var qx = gsap.quickTo(btn, 'x', { duration: 0.28, ease: 'power2.out' });
+      var qy = gsap.quickTo(btn, 'y', { duration: 0.28, ease: 'power2.out' });
       btn.addEventListener('mousemove', function(e) {
-        var r = btn.getBoundingClientRect();
+        var r  = btn.getBoundingClientRect();
         var cx = r.left + r.width / 2;
         var cy = r.top  + r.height / 2;
-        qx((e.clientX - cx) * 0.25);
-        qy((e.clientY - cy) * 0.35);
+        qx((e.clientX - cx) * 0.22);
+        qy((e.clientY - cy) * 0.3);
       });
-
       btn.addEventListener('mouseleave', function() { qx(0); qy(0); });
     });
   }
 
   /* ── Entrance ScrollTrigger ── */
+  function showAll() {
+    gsap.set([
+      section.querySelector('.tabs-entrance-label'),
+      section.querySelector('.tabs-entrance-title'),
+      section.querySelector('.tabs-entrance-sub')
+    ], { opacity: 1, y: 0 });
+    gsap.set(tabBtns, { opacity: 1, y: 0 });
+    gsap.set(contentWrap, { opacity: 1, y: 0 });
+    setBlobInstant(tabBtns[0]);
+  }
+
   function runEntrance() {
-    if (reducedMotion) {
-      // Show everything immediately
-      gsap.set([
-        section.querySelector('.tabs-entrance-label'),
-        section.querySelector('.tabs-entrance-title'),
-        section.querySelector('.tabs-entrance-sub')
-      ], { opacity: 1, y: 0 });
-      gsap.set(Array.from(tabBtns), { opacity: 1, y: 0 });
-      gsap.set(contentWrap, { opacity: 1, y: 0 });
-      // Position underline
-      setUnderlineInstant(tabBtns[0]);
-      return;
-    }
+    if (reducedMotion) { showAll(); return; }
 
     var tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: 'top 75%',
-        once: true
-      }
+      scrollTrigger: { trigger: section, start: 'top 75%', once: true }
     });
 
     tl.to(section.querySelector('.tabs-entrance-label'),
@@ -192,49 +184,31 @@
         { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, '-=0.38')
       .to(section.querySelector('.tabs-entrance-sub'),
         { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }, '-=0.32')
-      .to(Array.from(tabBtns),
-        { opacity: 1, y: 0, duration: 0.35, stagger: 0.07, ease: 'power3.out' }, '-=0.28')
+      .to(tabBtns,
+        { opacity: 1, y: 0, duration: 0.32, stagger: 0.07, ease: 'power3.out' }, '-=0.28')
       .to(contentWrap,
-        { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }, '-=0.2')
-      .call(function() {
-        // Set underline to first tab after entrance
-        setUnderlineInstant(tabBtns[0]);
-      });
+        { opacity: 1, y: 0, duration: 0.42, ease: 'power3.out' }, '-=0.18')
+      .call(function() { setBlobInstant(tabBtns[0]); });
   }
 
   /* ── Init ── */
-  // Set first panel visible
   panels[0].style.display = 'block';
-  gsap.set(panels[0], { opacity: 1 });
-
-  // Init mechanism
-  setMechActive(0);
-
-  // Counter
+  gsap.set(panels[0], { opacity: 1, filter: 'blur(0px)' });
   counterNum.textContent = '01';
 
-  // Run entrance
   if (typeof ScrollTrigger !== 'undefined') {
     runEntrance();
   } else {
-    // Fallback: show immediately
-    gsap.set([
-      section.querySelector('.tabs-entrance-label'),
-      section.querySelector('.tabs-entrance-title'),
-      section.querySelector('.tabs-entrance-sub')
-    ], { opacity: 1, y: 0 });
-    gsap.set(Array.from(tabBtns), { opacity: 1, y: 0 });
-    gsap.set(contentWrap, { opacity: 1, y: 0 });
-    setUnderlineInstant(tabBtns[0]);
+    showAll();
   }
 
-  // Recalculate underline on resize
+  /* ── Recalculate blob on resize ── */
   var resizeTimer;
   window.addEventListener('resize', function() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function() {
       isMobile = window.matchMedia('(max-width: 700px)').matches;
-      setUnderlineInstant(tabBtns[currentIndex]);
+      setBlobInstant(tabBtns[currentIndex]);
     }, 120);
   });
 
