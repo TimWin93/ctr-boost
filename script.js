@@ -1,28 +1,33 @@
 /* ═══════════════════════════════════════════════
-   TABS SYSTEM — GSAP PRO (pill / blob)
+   TABS SYSTEM — GSAP PRO v3 (pill/blob + glow sweep + word stagger + chips)
 ═══════════════════════════════════════════════ */
 
 (function() {
-  var section       = document.querySelector('.tabs-section');
+  var section      = document.querySelector('.tabs-section');
   if (!section) return;
 
-  var tabBtns       = Array.from(section.querySelectorAll('.tab-btn'));
-  var panels        = Array.from(section.querySelectorAll('.tab-panel'));
-  var blob          = section.querySelector('.tabs-blob');
-  var counterNum    = section.querySelector('.tab-counter-num');
-  var contentWrap   = section.querySelector('.tabs-content-wrap');
-  var navEl         = section.querySelector('.tabs-nav');
+  var tabBtns      = Array.from(section.querySelectorAll('.tab-btn'));
+  var panels       = Array.from(section.querySelectorAll('.tab-panel'));
+  var blob         = section.querySelector('.tabs-blob');
+  var counterNum   = section.querySelector('.tab-counter-num');
+  var contentWrap  = section.querySelector('.tabs-content-wrap');
+  var navEl        = section.querySelector('.tabs-nav');
+  var words        = Array.from(section.querySelectorAll('.tabs-entrance-title .word'));
+  var chips        = Array.from(section.querySelectorAll('.mech-chip'));
+  var sweepEl      = contentWrap; /* ::before sweep driven via custom CSS var trick — see below */
 
   var currentIndex  = 0;
   var isAnimating   = false;
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var isMobile      = window.matchMedia('(max-width: 700px)').matches;
 
-  /* ── Blob position helper ── */
+  /* ══════════════════════════════
+     BLOB helpers
+  ══════════════════════════════ */
   function getBlobTarget(btn) {
     var nr = navEl.getBoundingClientRect();
     var br = btn.getBoundingClientRect();
-    return { x: br.left - nr.left - 5, w: br.width }; /* -5 accounts for nav padding */
+    return { x: br.left - nr.left - 5, w: br.width };
   }
 
   function setBlobInstant(btn) {
@@ -30,7 +35,9 @@
     gsap.set(blob, { x: t.x, width: t.w });
   }
 
-  /* ── Counter animation ── */
+  /* ══════════════════════════════
+     COUNTER
+  ══════════════════════════════ */
   function animateCounter(idx) {
     var label = String(idx + 1).padStart(2, '0');
     if (reducedMotion) { counterNum.textContent = label; return; }
@@ -46,7 +53,60 @@
     });
   }
 
-  /* ── Switch tab ── */
+  /* ══════════════════════════════
+     MECHANISM CHIPS
+  ══════════════════════════════ */
+  function setChipActive(idx) {
+    chips.forEach(function(chip, i) {
+      chip.classList.toggle('active', i === idx);
+      if (reducedMotion) return;
+      if (i === idx) {
+        gsap.fromTo(chip,
+          { scale: 1, opacity: 0.45 },
+          { scale: 1.04, opacity: 1, duration: 0.25, ease: 'power2.out',
+            onComplete: function() { gsap.to(chip, { scale: 1, duration: 0.15 }); }
+          }
+        );
+      } else {
+        gsap.to(chip, { opacity: 0.45, duration: 0.2 });
+      }
+    });
+  }
+
+  /* ══════════════════════════════
+     GLOW SWEEP (::before via pseudo-wrapper)
+     We animate a real div overlay instead of ::before
+     for full GSAP control
+  ══════════════════════════════ */
+  var sweepDiv = document.createElement('div');
+  sweepDiv.className = 'tabs-sweep';
+  contentWrap.insertBefore(sweepDiv, contentWrap.firstChild);
+
+  function runSweep() {
+    if (reducedMotion) return;
+    gsap.fromTo(sweepDiv,
+      { x: '-100%', opacity: 1 },
+      { x: '160%', opacity: 1, duration: 0.9, ease: 'power2.inOut',
+        onComplete: function() { gsap.set(sweepDiv, { opacity: 0 }); }
+      }
+    );
+  }
+
+  /* subtle hover sweep */
+  if (!isMobile && !reducedMotion) {
+    contentWrap.addEventListener('mouseenter', function() {
+      gsap.fromTo(sweepDiv,
+        { x: '-60%', opacity: 0.7 },
+        { x: '160%', opacity: 0.7, duration: 1.1, ease: 'power1.inOut',
+          onComplete: function() { gsap.set(sweepDiv, { opacity: 0 }); }
+        }
+      );
+    });
+  }
+
+  /* ══════════════════════════════
+     SWITCH TAB
+  ══════════════════════════════ */
   function switchTab(newIdx) {
     if (newIdx === currentIndex || isAnimating) return;
     isAnimating = true;
@@ -55,7 +115,6 @@
     var newPanel = panels[newIdx];
     var newBtn   = tabBtns[newIdx];
 
-    /* Aria + active class */
     tabBtns.forEach(function(b, i) {
       b.classList.toggle('active', i === newIdx);
       b.setAttribute('aria-selected', i === newIdx ? 'true' : 'false');
@@ -63,114 +122,122 @@
 
     currentIndex = newIdx;
     animateCounter(newIdx);
+    setChipActive(newIdx);
 
-    /* ── Reduced motion: instant switch ── */
+    /* ── Reduced motion ── */
     if (reducedMotion) {
       oldPanel.classList.remove('active');
       oldPanel.style.display = 'none';
       newPanel.style.display = 'block';
       newPanel.classList.add('active');
-      gsap.set(newPanel, { opacity: 1, y: 0, filter: 'blur(0px)' });
+      gsap.set(newPanel, { opacity: 1, y: 0, clearProps: 'filter' });
       setBlobInstant(newBtn);
       isAnimating = false;
       return;
     }
 
-    /* ── Blob morph: move + 2-step width overshoot ── */
-    var target = getBlobTarget(newBtn);
+    /* Blob morph */
+    var t = getBlobTarget(newBtn);
     gsap.to(blob, {
-      x: target.x,
-      width: target.w * 1.06,
-      duration: 0.3,
-      ease: 'power3.out',
+      x: t.x, width: t.w * 1.06, duration: 0.3, ease: 'power3.out',
       onComplete: function() {
-        gsap.to(blob, { width: target.w, duration: 0.22, ease: 'power2.out' });
+        gsap.to(blob, { width: t.w, duration: 0.2, ease: 'power2.out' });
       }
     });
 
-    /* ── Active tab pulse ── */
+    /* Active tab pulse */
     gsap.fromTo(newBtn, { scale: 0.97 }, { scale: 1, duration: 0.2, ease: 'power2.out' });
 
-    /* ── Old panel out ── */
+    /* Old panel out */
     gsap.to(oldPanel, {
-      opacity: 0,
-      y: -6,
-      filter: 'blur(3px)',
-      duration: 0.18,
-      ease: 'power2.in',
+      opacity: 0, y: -6, filter: 'blur(3px)',
+      duration: 0.18, ease: 'power2.in',
       onComplete: function() {
         oldPanel.classList.remove('active');
         oldPanel.style.display = 'none';
-        gsap.set(oldPanel, { opacity: 0, y: 0, filter: 'blur(0px)' });
+        gsap.set(oldPanel, { opacity: 0, y: 0, clearProps: 'filter' });
 
-        /* ── New panel in ── */
+        /* New panel in */
         newPanel.style.display = 'block';
         newPanel.classList.add('active');
         gsap.fromTo(newPanel,
-          { opacity: 0, y: 10, filter: 'blur(5px)' },
-          {
-            opacity: 1, y: 0, filter: 'blur(0px)',
+          { opacity: 0, y: 10, filter: 'blur(6px)' },
+          { opacity: 1, y: 0, filter: 'blur(0px)',
             duration: 0.32, ease: 'power3.out',
-            onComplete: function() { isAnimating = false; }
+            onComplete: function() {
+              gsap.set(newPanel, { clearProps: 'filter' });
+              isAnimating = false;
+            }
+          }
+        );
+
+        /* mini sweep on each switch */
+        gsap.fromTo(sweepDiv,
+          { x: '-100%', opacity: 0.8 },
+          { x: '160%', opacity: 0.8, duration: 0.7, ease: 'power2.out',
+            onComplete: function() { gsap.set(sweepDiv, { opacity: 0 }); }
           }
         );
       }
     });
   }
 
-  /* ── Button click ── */
+  /* ══════════════════════════════
+     CLICK + KEYBOARD
+  ══════════════════════════════ */
   tabBtns.forEach(function(btn, i) {
     btn.id = 'tab-btn-' + i;
     btn.addEventListener('click', function() { switchTab(i); });
   });
 
-  /* ── Keyboard navigation ── */
   navEl.addEventListener('keydown', function(e) {
     var total = tabBtns.length;
     if (e.key === 'ArrowRight') {
       e.preventDefault();
       var next = (currentIndex + 1) % total;
-      switchTab(next);
-      tabBtns[next].focus();
+      switchTab(next); tabBtns[next].focus();
     }
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
       var prev = (currentIndex - 1 + total) % total;
-      switchTab(prev);
-      tabBtns[prev].focus();
+      switchTab(prev); tabBtns[prev].focus();
     }
     if (e.key === 'Home') { e.preventDefault(); switchTab(0); tabBtns[0].focus(); }
     if (e.key === 'End')  { e.preventDefault(); switchTab(total - 1); tabBtns[total - 1].focus(); }
   });
 
-  /* ── Magnetic hover (desktop only) ── */
+  /* ══════════════════════════════
+     MAGNETIC HOVER (desktop only)
+  ══════════════════════════════ */
   if (!isMobile && !reducedMotion) {
     tabBtns.forEach(function(btn) {
       var qx = gsap.quickTo(btn, 'x', { duration: 0.28, ease: 'power2.out' });
       var qy = gsap.quickTo(btn, 'y', { duration: 0.28, ease: 'power2.out' });
       btn.addEventListener('mousemove', function(e) {
-        var r  = btn.getBoundingClientRect();
-        var cx = r.left + r.width / 2;
-        var cy = r.top  + r.height / 2;
-        qx((e.clientX - cx) * 0.22);
-        qy((e.clientY - cy) * 0.3);
+        var r = btn.getBoundingClientRect();
+        qx((e.clientX - r.left - r.width  / 2) * 0.2);
+        qy((e.clientY - r.top  - r.height / 2) * 0.28);
       });
       btn.addEventListener('mouseleave', function() { qx(0); qy(0); });
     });
   }
 
-  /* ── Entrance ScrollTrigger ── */
+  /* ══════════════════════════════
+     ENTRANCE — showAll (instant)
+  ══════════════════════════════ */
   function showAll() {
-    gsap.set([
-      section.querySelector('.tabs-entrance-label'),
-      section.querySelector('.tabs-entrance-title'),
-      section.querySelector('.tabs-entrance-sub')
-    ], { opacity: 1, y: 0 });
+    gsap.set(section.querySelector('.tabs-entrance-label'), { opacity: 1, y: 0 });
+    gsap.set(words, { opacity: 1, y: 0 });
+    gsap.set(section.querySelector('.tabs-entrance-sub'), { opacity: 1, y: 0 });
     gsap.set(tabBtns, { opacity: 1, y: 0 });
     gsap.set(contentWrap, { opacity: 1, y: 0 });
     setBlobInstant(tabBtns[0]);
+    setChipActive(0);
   }
 
+  /* ══════════════════════════════
+     ENTRANCE — animated
+  ══════════════════════════════ */
   function runEntrance() {
     if (reducedMotion) { showAll(); return; }
 
@@ -179,21 +246,37 @@
     });
 
     tl.to(section.querySelector('.tabs-entrance-label'),
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' })
-      .to(section.querySelector('.tabs-entrance-title'),
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, '-=0.38')
+        { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' })
+
+      /* word stagger */
+      .to(words,
+        { opacity: 1, y: 0, duration: 0.38, stagger: 0.07, ease: 'power3.out' }, '-=0.28')
+
       .to(section.querySelector('.tabs-entrance-sub'),
-        { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }, '-=0.32')
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, '-=0.2')
+
+      /* pill nav stagger */
       .to(tabBtns,
-        { opacity: 1, y: 0, duration: 0.32, stagger: 0.07, ease: 'power3.out' }, '-=0.28')
+        { opacity: 1, y: 0, duration: 0.3, stagger: 0.06, ease: 'power3.out' }, '-=0.22')
+
+      /* content panel */
       .to(contentWrap,
-        { opacity: 1, y: 0, duration: 0.42, ease: 'power3.out' }, '-=0.18')
-      .call(function() { setBlobInstant(tabBtns[0]); });
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, '-=0.15')
+
+      /* after all visible: position blob + sweep */
+      .call(function() {
+        setBlobInstant(tabBtns[0]);
+        setChipActive(0);
+        runSweep();
+      });
   }
 
-  /* ── Init ── */
+  /* ══════════════════════════════
+     INIT
+  ══════════════════════════════ */
   panels[0].style.display = 'block';
-  gsap.set(panels[0], { opacity: 1, filter: 'blur(0px)' });
+  gsap.set(panels[0], { opacity: 1 });
+  gsap.set(sweepDiv, { opacity: 0 });
   counterNum.textContent = '01';
 
   if (typeof ScrollTrigger !== 'undefined') {
@@ -202,7 +285,7 @@
     showAll();
   }
 
-  /* ── Recalculate blob on resize ── */
+  /* resize → recalculate blob */
   var resizeTimer;
   window.addEventListener('resize', function() {
     clearTimeout(resizeTimer);
