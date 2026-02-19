@@ -181,139 +181,110 @@
   </div>
 </section>
 
-<!-- ═══════════════ BLOCK 3.5: СИСТЕМА РОСТА CTR (TABS) ═══════════════ -->
-<section class="tabs-section" id="system">
-  <div class="container">
+<!-- ═══════════════ BLOCK 3.5: СИСТЕМА (TABS 2.0) ═══════════════ -->
+<section id="system" class="system">
+  <div class="system__container">
 
-    <!-- HERO TITLE — no badge, full-width -->
-    <h2 class="sys-hero-title">
-      <span class="sys-word">4&nbsp;части.</span>
-      <span class="sys-word">Один&nbsp;механизм.</span>
-      <br class="sys-word-break" aria-hidden="true">
-      <span class="sys-word">Работают</span>
-      <span class="sys-word">только</span>
-      <span class="sys-word sys-word-accent">вместе.</span>
+    <h2 class="system__title">
+      4 части. <span class="accent">Один механизм.</span><br>
+      Работают <span class="accent">только вместе.</span>
     </h2>
 
-    <!-- SVG engineering lines: decorative connector from title to tabs -->
-    <div class="sys-wires-wrap" aria-hidden="true">
-      <svg class="sys-wires" viewBox="0 0 1000 60" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- horizontal connector at top spanning full width -->
-        <line class="sys-wire-h" x1="100" y1="2" x2="900" y2="2"/>
-        <!-- 4 vertical drop lines evenly distributed -->
-        <line class="sys-wire" data-idx="0" x1="200" y1="2" x2="200" y2="60"/>
-        <line class="sys-wire" data-idx="1" x1="400" y1="2" x2="400" y2="60"/>
-        <line class="sys-wire" data-idx="2" x1="600" y1="2" x2="600" y2="60"/>
-        <line class="sys-wire" data-idx="3" x1="800" y1="2" x2="800" y2="60"/>
-      </svg>
+    <p class="system__subtitle">Система роста CTR вашей карточки</p>
+
+    <div class="system__tabs" role="tablist" aria-label="Части системы">
+
+      <button class="system__tab active" role="tab" aria-selected="true"
+              aria-controls="panel-strategy" id="tab-strategy" data-tab="strategy">
+        <span class="system__tab-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/>
+            <line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="22" y2="12"/>
+          </svg>
+        </span>
+        <span>Стратегия</span>
+      </button>
+
+      <button class="system__tab" role="tab" aria-selected="false"
+              aria-controls="panel-meaning" id="tab-meaning" data-tab="meaning">
+        <span class="system__tab-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a7 7 0 0 1 4 12.9V17H8v-2.1A7 7 0 0 1 12 2z"/>
+            <line x1="9" y1="21" x2="15" y2="21"/><line x1="10" y1="17" x2="14" y2="17"/>
+          </svg>
+        </span>
+        <span>Смысл</span>
+      </button>
+
+      <button class="system__tab" role="tab" aria-selected="false"
+              aria-controls="panel-analytics" id="tab-analytics" data-tab="analytics">
+        <span class="system__tab-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-8"/>
+          </svg>
+        </span>
+        <span>Аналитика</span>
+      </button>
+
+      <button class="system__tab" role="tab" aria-selected="false"
+              aria-controls="panel-tech" id="tab-tech" data-tab="tech">
+        <span class="system__tab-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/>
+          </svg>
+        </span>
+        <span>Технология</span>
+      </button>
+
     </div>
 
-    <!-- Tabs nav — pill cards with icons -->
-    <div class="tabs-nav-wrap">
-      <div class="tabs-nav" role="tablist" aria-label="Части системы">
-        <div class="tabs-blob" aria-hidden="true"></div>
+    <div class="system__panels">
 
-        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-panel-0" data-index="0">
-          <span class="tab-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
-            </svg>
-          </span>
-          Стратегия
-        </button>
-
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-panel-1" data-index="1">
-          <span class="tab-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 4 12.9V17H8v-2.1A7 7 0 0 1 12 2z"/>
-            </svg>
-          </span>
-          Смысл
-        </button>
-
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-panel-2" data-index="2">
-          <span class="tab-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-8"/>
-            </svg>
-          </span>
-          Аналитика
-        </button>
-
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-panel-3" data-index="3">
-          <span class="tab-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/>
-            </svg>
-          </span>
-          Технология
-        </button>
-      </div>
-    </div>
-
-    <!-- Tabs content -->
-    <div class="tabs-content-wrap">
-      <div class="tab-counter" aria-hidden="true">
-        <span class="tab-counter-num">01</span><span class="tab-counter-sep">/</span><span class="tab-counter-total">04</span>
-      </div>
-
-      <div class="tab-panel active" id="tab-panel-0" role="tabpanel" aria-labelledby="tab-btn-0">
-        <p class="tab-panel-desc">Определяем, где лежит рост CTR в вашей категории.</p>
-        <ul class="tab-bullets">
+      <div class="system__panel active" id="panel-strategy" role="tabpanel" aria-labelledby="tab-strategy">
+        <h3 class="panel__lead">Находим точку роста в вашей категории</h3>
+        <ul class="panel__list">
           <li>Сценарий захвата клика</li>
-          <li>Приоритеты в выдаче</li>
-          <li>Гипотезы роста</li>
+          <li>Позиционирование против конкурентов</li>
+          <li>Формирование гипотез роста</li>
         </ul>
       </div>
 
-      <div class="tab-panel" id="tab-panel-1" role="tabpanel" aria-labelledby="tab-btn-1">
-        <p class="tab-panel-desc">Что человек должен понять за 0,3 секунды.</p>
-        <ul class="tab-bullets">
-          <li>Главный визуальный акцент</li>
-          <li>Ключевое действие товара</li>
-          <li>Плашки, которые снимают сомнения</li>
-          <li>Убираем всё лишнее</li>
+      <div class="system__panel" id="panel-meaning" role="tabpanel" aria-labelledby="tab-meaning">
+        <h3 class="panel__lead">Что человек должен понять за 0,3 секунды</h3>
+        <ul class="panel__list">
+          <li>Главный визуальный триггер</li>
+          <li>Фокус внимания</li>
+          <li>Минимизация шума</li>
         </ul>
       </div>
 
-      <div class="tab-panel" id="tab-panel-2" role="tabpanel" aria-labelledby="tab-btn-2">
-        <p class="tab-panel-desc">Рост подтверждается цифрами, не вкусом.</p>
-        <ul class="tab-bullets">
-          <li>Анализ выдачи и конкурентов</li>
-          <li>A/B-тест</li>
-          <li>Фиксация победителя</li>
+      <div class="system__panel" id="panel-analytics" role="tabpanel" aria-labelledby="tab-analytics">
+        <h3 class="panel__lead">Подтверждаем рост цифрами</h3>
+        <ul class="panel__list">
+          <li>A/B-тест на реальном трафике</li>
+          <li>Равные условия запуска</li>
+          <li>Выбор победителя по CTR</li>
         </ul>
       </div>
 
-      <div class="tab-panel" id="tab-panel-3" role="tabpanel" aria-labelledby="tab-btn-3">
-        <p class="tab-panel-desc">Скорость: от гипотезы до теста.</p>
-        <ul class="tab-bullets">
+      <div class="system__panel" id="panel-tech" role="tabpanel" aria-labelledby="tab-tech">
+        <h3 class="panel__lead">Ускоряем цикл улучшений</h3>
+        <ul class="panel__list">
           <li>AI-генерация вариантов</li>
-          <li>Быстрая сборка</li>
-          <li>Подготовка к A/B</li>
+          <li>Быстрые итерации</li>
+          <li>Фиксация результата</li>
         </ul>
       </div>
+
     </div>
 
-    <!-- Flow finale -->
-    <div class="sys-flow-finale" aria-hidden="true">
-      <div class="sys-flow-row">
-        <span class="sys-flow-item" data-fidx="0">Стратегия</span>
-        <span class="sys-flow-arrow">→</span>
-        <span class="sys-flow-item" data-fidx="1">Смысл</span>
-        <span class="sys-flow-arrow">→</span>
-        <span class="sys-flow-item" data-fidx="2">Аналитика</span>
-        <span class="sys-flow-arrow">→</span>
-        <span class="sys-flow-item" data-fidx="3">Технология</span>
-      </div>
-      <div class="sys-flow-result">→ Рост CTR</div>
-    </div>
-
-    <!-- Footer tagline -->
-    <div class="tabs-footer">
-      <p>По отдельности это инструменты. Вместе — система.<br>
-      <span class="tabs-footer-flow">Стратегия задаёт направление → смысл забирает клик → аналитика подтверждает → технология ускоряет цикл.</span></p>
+    <div class="system__final">
+      <h3>
+        По отдельности — инструменты.<br>
+        Вместе — <span class="accent">система роста CTR.</span>
+      </h3>
     </div>
 
   </div>
