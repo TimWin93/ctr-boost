@@ -1303,29 +1303,41 @@ section:nth-child(even) {
   font-family: 'Manrope', sans-serif;
   font-size: clamp(36px, 5.5vw, 64px);
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.15;
   letter-spacing: -0.04em;
   margin-bottom: 0;
+  /* fallback for browsers that don't support gradient text */
+  color: #F5F5F7;
   /* gradient text */
   background: linear-gradient(
-    135deg,
+    100deg,
     #F5F5F7 0%,
-    #F59E0B 35%,
+    #F5F5F7 20%,
+    #F59E0B 40%,
     #FBBF24 50%,
-    #F5F5F7 65%,
-    #F59E0B 100%
+    #F59E0B 60%,
+    #F5F5F7 80%,
+    #F5F5F7 100%
   );
-  background-size: 300% 100%;
+  background-size: 250% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  /* shimmer animation */
-  animation: sys-shimmer 10s linear infinite;
+  animation: sys-shimmer 9s linear infinite;
+}
+
+/* Firefox fallback — doesn't support background-clip:text well */
+@supports not (-webkit-background-clip: text) {
+  .sys-hero-title {
+    background: none;
+    color: #F5F5F7;
+    -webkit-text-fill-color: unset;
+  }
 }
 
 @keyframes sys-shimmer {
-  0%   { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
+  0%   { background-position: 120% 0; }
+  100% { background-position: -120% 0; }
 }
 
 .sys-word {
@@ -1335,16 +1347,18 @@ section:nth-child(even) {
   will-change: transform, opacity;
 }
 
+/* line-break: invisible block with no stagger delay */
 .sys-word-break {
   display: block;
   height: 0;
-  opacity: 1 !important;
-  transform: none !important;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .sys-word-accent {
-  /* extra warm tint on last word */
-  filter: drop-shadow(0 0 24px rgba(245,158,11,0.35));
+  /* subtle warm glow on "вместе." */
+  filter: drop-shadow(0 0 20px rgba(245,158,11,0.3));
 }
 
 /* ── SVG wires ── */
@@ -1363,23 +1377,22 @@ section:nth-child(even) {
 }
 
 .sys-wire {
-  stroke: rgba(245,158,11,0.18);
-  stroke-width: 1;
-  stroke-dasharray: 80;
-  stroke-dashoffset: 80;
-  transition: none;
+  stroke: rgba(245,158,11,0.2);
+  stroke-width: 1.5;
+  stroke-dasharray: 82;
+  stroke-dashoffset: 82;
 }
 
 .sys-wire.active-wire {
-  stroke: rgba(245,158,11,0.7);
-  filter: drop-shadow(0 0 3px rgba(245,158,11,0.5));
+  stroke: rgba(245,158,11,0.75);
+  filter: drop-shadow(0 0 4px rgba(245,158,11,0.55));
 }
 
 .sys-wire-h {
-  stroke: rgba(245,158,11,0.1);
+  stroke: rgba(245,158,11,0.12);
   stroke-width: 1;
-  stroke-dasharray: 700;
-  stroke-dashoffset: 700;
+  stroke-dasharray: 680;
+  stroke-dashoffset: 680;
 }
 
 /* ── Pill nav ── */
@@ -1439,7 +1452,7 @@ section:nth-child(even) {
 
 .tab-btn:hover {
   color: var(--text-secondary);
-  transform: translateY(-3px) scale(1.02);
+  /* transform handled by GSAP magnetic — no CSS conflict */
 }
 
 .tab-btn:focus-visible {

@@ -1,41 +1,51 @@
 /* ═══════════════════════════════════════════════
-   TABS SYSTEM — GSAP PRO v4 (Apple-style premium)
+   TABS SYSTEM — GSAP PRO v4.1 (fixed)
 ════════════════════════════════════════════════ */
 
 (function() {
-  var section      = document.querySelector('.tabs-section');
+  var section     = document.querySelector('.tabs-section');
   if (!section) return;
 
-  var tabBtns      = Array.from(section.querySelectorAll('.tab-btn'));
-  var panels       = Array.from(section.querySelectorAll('.tab-panel'));
-  var blob         = section.querySelector('.tabs-blob');
-  var counterNum   = section.querySelector('.tab-counter-num');
-  var contentWrap  = section.querySelector('.tabs-content-wrap');
-  var navEl        = section.querySelector('.tabs-nav');
-  var words        = Array.from(section.querySelectorAll('.sys-word:not(.sys-word-break)'));
-  var wires        = Array.from(section.querySelectorAll('.sys-wire'));
-  var wireH        = section.querySelector('.sys-wire-h');
-  var flowItems    = Array.from(section.querySelectorAll('.sys-flow-item'));
-  var flowResult   = section.querySelector('.sys-flow-result');
-  var flowFinale   = section.querySelector('.sys-flow-finale');
+  var tabBtns     = Array.from(section.querySelectorAll('.tab-btn'));
+  var panels      = Array.from(section.querySelectorAll('.tab-panel'));
+  var blob        = section.querySelector('.tabs-blob');
+  var counterNum  = section.querySelector('.tab-counter-num');
+  var contentWrap = section.querySelector('.tabs-content-wrap');
+  var navEl       = section.querySelector('.tabs-nav');
+  /* exclude .sys-word-break from stagger — it's an invisible line-break */
+  var words       = Array.from(section.querySelectorAll('.sys-word:not(.sys-word-break)'));
+  var wires       = Array.from(section.querySelectorAll('.sys-wire'));
+  var wireH       = section.querySelector('.sys-wire-h');
+  var flowItems   = Array.from(section.querySelectorAll('.sys-flow-item'));
+  var flowResult  = section.querySelector('.sys-flow-result');
+  var flowFinale  = section.querySelector('.sys-flow-finale');
 
   var currentIndex  = 0;
   var isAnimating   = false;
+  var flowDone      = false;
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var isMobile      = window.matchMedia('(max-width: 700px)').matches;
 
-  /* ── Blob ── */
+  /* ════════════════════════════
+     BLOB helpers
+  ════════════════════════════ */
   function getBlobTarget(btn) {
     var nr = navEl.getBoundingClientRect();
     var br = btn.getBoundingClientRect();
     return { x: br.left - nr.left - 6, w: br.width };
   }
+
+  /* Defer to next frame so layout is complete */
   function setBlobInstant(btn) {
-    var t = getBlobTarget(btn);
-    gsap.set(blob, { x: t.x, width: t.w });
+    requestAnimationFrame(function() {
+      var t = getBlobTarget(btn);
+      gsap.set(blob, { x: t.x, width: t.w });
+    });
   }
 
-  /* ── Counter ── */
+  /* ════════════════════════════
+     COUNTER
+  ════════════════════════════ */
   function animateCounter(idx) {
     var label = String(idx + 1).padStart(2, '0');
     if (reducedMotion) { counterNum.textContent = label; return; }
@@ -43,37 +53,61 @@
       opacity: 0, y: -6, duration: 0.14, ease: 'power2.in',
       onComplete: function() {
         counterNum.textContent = label;
-        gsap.fromTo(counterNum, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' });
+        gsap.fromTo(counterNum,
+          { opacity: 0, y: 8 },
+          { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' }
+        );
       }
     });
   }
 
-  /* ── Wires: highlight active wire ── */
+  /* ════════════════════════════
+     SVG WIRES — use attr:{} for SVG properties
+  ════════════════════════════ */
   function setWireActive(idx) {
-    if (reducedMotion) return;
     wires.forEach(function(w, i) {
       if (i === idx) {
         w.classList.add('active-wire');
-        gsap.fromTo(w, { opacity: 0.3 }, { opacity: 1, duration: 0.4, ease: 'power2.out' });
+        gsap.to(w, { opacity: 1, duration: 0.4, ease: 'power2.out' });
       } else {
         w.classList.remove('active-wire');
-        gsap.to(w, { opacity: 0.4, duration: 0.3 });
+        gsap.to(w, { opacity: 0.35, duration: 0.3 });
       }
     });
   }
 
-  /* ── Sweep div ── */
+  function drawWires() {
+    /* horizontal line */
+    if (wireH) {
+      gsap.fromTo(wireH,
+        { attr: { 'stroke-dashoffset': 680 } },
+        { attr: { 'stroke-dashoffset': 0 }, duration: 0.7, ease: 'power2.inOut' }
+      );
+    }
+    /* vertical lines staggered */
+    gsap.fromTo(wires,
+      { attr: { 'stroke-dashoffset': 82 }, opacity: 0 },
+      { attr: { 'stroke-dashoffset': 0 }, opacity: 0.35,
+        duration: 0.45, stagger: 0.07, ease: 'power2.out', delay: 0.15 }
+    );
+  }
+
+  /* ════════════════════════════
+     SWEEP DIV
+  ════════════════════════════ */
   var sweepDiv = document.createElement('div');
   sweepDiv.className = 'tabs-sweep';
   contentWrap.insertBefore(sweepDiv, contentWrap.firstChild);
-  gsap.set(sweepDiv, { opacity: 0 });
+  gsap.set(sweepDiv, { opacity: 0, x: '-100%' });
 
   function runSweep(fast) {
     if (reducedMotion) return;
-    var dur = fast ? 0.6 : 0.9;
+    var dur = fast ? 0.55 : 0.85;
+    var op  = fast ? 0.65 : 0.9;
+    gsap.killTweensOf(sweepDiv);
     gsap.fromTo(sweepDiv,
-      { x: '-100%', opacity: fast ? 0.7 : 1 },
-      { x: '160%', opacity: fast ? 0.7 : 1, duration: dur, ease: 'power2.inOut',
+      { x: '-100%', opacity: op },
+      { x: '160%',  opacity: op, duration: dur, ease: 'power2.inOut',
         onComplete: function() { gsap.set(sweepDiv, { opacity: 0 }); }
       }
     );
@@ -83,17 +117,28 @@
     contentWrap.addEventListener('mouseenter', function() { runSweep(true); });
   }
 
-  /* ── Flow finale animation ── */
+  /* ════════════════════════════
+     FLOW FINALE (one-shot)
+  ════════════════════════════ */
   function runFlowFinale() {
-    if (reducedMotion) return;
+    if (reducedMotion || flowDone) return;
+    flowDone = true;
     var tl = gsap.timeline();
     flowItems.forEach(function(item, i) {
-      tl.to(item, { opacity: 1, color: 'var(--accent)', duration: 0.22, ease: 'power2.out' }, i * 0.28);
+      tl.to(item,
+        { opacity: 1, color: '#F59E0B', duration: 0.22, ease: 'power2.out' },
+        i * 0.3
+      );
     });
-    tl.to(flowResult, { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' }, '+=0.1');
+    tl.to(flowResult,
+      { opacity: 1, y: 0, duration: 0.38, ease: 'power3.out' },
+      '+=0.12'
+    );
   }
 
-  /* ── Switch tab ── */
+  /* ════════════════════════════
+     SWITCH TAB
+  ════════════════════════════ */
   function switchTab(newIdx) {
     if (newIdx === currentIndex || isAnimating) return;
     isAnimating = true;
@@ -111,17 +156,22 @@
     animateCounter(newIdx);
     setWireActive(newIdx);
 
-    /* icon rotate on new active tab */
+    /* icon wiggle on active tab */
     if (!reducedMotion) {
       var icon = newBtn.querySelector('.tab-icon');
-      if (icon) gsap.fromTo(icon, { rotation: -8 }, { rotation: 8, duration: 0.35, ease: 'power2.out',
-        onComplete: function() { gsap.to(icon, { rotation: 0, duration: 0.2 }); }
-      });
+      if (icon) {
+        gsap.killTweensOf(icon);
+        gsap.fromTo(icon,
+          { rotation: -6 },
+          { rotation: 0, duration: 0.38, ease: 'elastic.out(1, 0.5)' }
+        );
+      }
     }
 
+    /* ── reduced motion instant switch ── */
     if (reducedMotion) {
       oldPanel.classList.remove('active'); oldPanel.style.display = 'none';
-      newPanel.style.display = 'block'; newPanel.classList.add('active');
+      newPanel.style.display = 'block';   newPanel.classList.add('active');
       gsap.set(newPanel, { opacity: 1, y: 0, clearProps: 'filter' });
       setBlobInstant(newBtn);
       isAnimating = false;
@@ -129,27 +179,41 @@
     }
 
     /* blob morph */
-    var t = getBlobTarget(newBtn);
-    gsap.to(blob, {
-      x: t.x, width: t.w * 1.06, duration: 0.32, ease: 'power3.out',
-      onComplete: function() { gsap.to(blob, { width: t.w, duration: 0.2, ease: 'power2.out' }); }
+    requestAnimationFrame(function() {
+      var t = getBlobTarget(newBtn);
+      gsap.to(blob, {
+        x: t.x, width: t.w * 1.05,
+        duration: 0.3, ease: 'power3.out',
+        onComplete: function() {
+          gsap.to(blob, { width: t.w, duration: 0.18, ease: 'power2.out' });
+        }
+      });
     });
 
-    /* pulse */
+    /* pulse active button */
     gsap.fromTo(newBtn, { scale: 0.96 }, { scale: 1, duration: 0.22, ease: 'power2.out' });
 
-    /* old out */
+    /* old panel out */
     gsap.to(oldPanel, {
-      opacity: 0, y: -6, filter: 'blur(3px)', duration: 0.18, ease: 'power2.in',
+      opacity: 0, y: -6, filter: 'blur(3px)',
+      duration: 0.17, ease: 'power2.in',
       onComplete: function() {
-        oldPanel.classList.remove('active'); oldPanel.style.display = 'none';
+        oldPanel.classList.remove('active');
+        oldPanel.style.display = 'none';
         gsap.set(oldPanel, { opacity: 0, y: 0, clearProps: 'filter' });
 
-        newPanel.style.display = 'block'; newPanel.classList.add('active');
+        /* new panel in */
+        newPanel.style.display = 'block';
+        newPanel.classList.add('active');
         gsap.fromTo(newPanel,
-          { opacity: 0, y: 10, filter: 'blur(6px)' },
-          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.32, ease: 'power3.out',
-            onComplete: function() { gsap.set(newPanel, { clearProps: 'filter' }); isAnimating = false; }
+          { opacity: 0, y: 10, filter: 'blur(5px)' },
+          {
+            opacity: 1, y: 0, filter: 'blur(0px)',
+            duration: 0.3, ease: 'power3.out',
+            onComplete: function() {
+              gsap.set(newPanel, { clearProps: 'filter' });
+              isAnimating = false;
+            }
           }
         );
         runSweep(true);
@@ -157,7 +221,9 @@
     });
   }
 
-  /* ── Clicks + keyboard ── */
+  /* ════════════════════════════
+     CLICK + KEYBOARD
+  ════════════════════════════ */
   tabBtns.forEach(function(btn, i) {
     btn.id = 'tab-btn-' + i;
     btn.addEventListener('click', function() { switchTab(i); });
@@ -165,75 +231,111 @@
 
   navEl.addEventListener('keydown', function(e) {
     var total = tabBtns.length;
-    if (e.key === 'ArrowRight') { e.preventDefault(); var n = (currentIndex+1)%total; switchTab(n); tabBtns[n].focus(); }
-    if (e.key === 'ArrowLeft')  { e.preventDefault(); var p = (currentIndex-1+total)%total; switchTab(p); tabBtns[p].focus(); }
+    var next, prev;
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      next = (currentIndex + 1) % total;
+      switchTab(next); tabBtns[next].focus();
+    }
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      prev = (currentIndex - 1 + total) % total;
+      switchTab(prev); tabBtns[prev].focus();
+    }
     if (e.key === 'Home') { e.preventDefault(); switchTab(0); tabBtns[0].focus(); }
-    if (e.key === 'End')  { e.preventDefault(); switchTab(total-1); tabBtns[total-1].focus(); }
+    if (e.key === 'End')  { e.preventDefault(); switchTab(total - 1); tabBtns[total - 1].focus(); }
   });
 
-  /* ── Magnetic hover ── */
+  /* ════════════════════════════
+     MAGNETIC HOVER (desktop only)
+  ════════════════════════════ */
   if (!isMobile && !reducedMotion) {
     tabBtns.forEach(function(btn) {
-      var qx = gsap.quickTo(btn, 'x', { duration: 0.28, ease: 'power2.out' });
-      var qy = gsap.quickTo(btn, 'y', { duration: 0.28, ease: 'power2.out' });
+      var qx = gsap.quickTo(btn, 'x', { duration: 0.3, ease: 'power2.out' });
+      var qy = gsap.quickTo(btn, 'y', { duration: 0.3, ease: 'power2.out' });
       btn.addEventListener('mousemove', function(e) {
         var r = btn.getBoundingClientRect();
-        qx((e.clientX - r.left - r.width/2) * 0.2);
-        qy((e.clientY - r.top  - r.height/2) * 0.28);
+        qx((e.clientX - r.left - r.width  / 2) * 0.18);
+        qy((e.clientY - r.top  - r.height / 2) * 0.22);
       });
       btn.addEventListener('mouseleave', function() { qx(0); qy(0); });
     });
   }
 
-  /* ── showAll (instant fallback) ── */
+  /* ════════════════════════════
+     showAll — instant (fallback / reduced-motion)
+  ════════════════════════════ */
   function showAll() {
-    gsap.set(words, { opacity: 1, y: 0 });
-    gsap.set(tabBtns, { opacity: 1, y: 0, transform: 'none' });
+    gsap.set(words, { opacity: 1, y: 0, clearProps: 'transform' });
+    gsap.set(tabBtns, { opacity: 1, y: 0, clearProps: 'transform' });
     gsap.set(contentWrap, { opacity: 1, y: 0 });
     gsap.set(flowFinale, { opacity: 1, y: 0 });
     gsap.set(flowResult, { opacity: 1, y: 0 });
-    if (wireH) gsap.set(wireH, { strokeDashoffset: 0 });
-    wires.forEach(function(w) { gsap.set(w, { strokeDashoffset: 0, opacity: 1 }); });
-    setBlobInstant(tabBtns[0]);
-    setWireActive(0);
+    if (wireH) gsap.set(wireH, { attr: { 'stroke-dashoffset': 0 } });
+    wires.forEach(function(w) { gsap.set(w, { attr: { 'stroke-dashoffset': 0 }, opacity: 0.35 }); });
+    /* blob after layout */
+    requestAnimationFrame(function() {
+      setBlobInstant(tabBtns[0]);
+      setWireActive(0);
+    });
+    /* show flow finale items immediately */
+    gsap.set(flowItems, { opacity: 1, color: '#F59E0B' });
+    gsap.set(flowResult, { opacity: 1, y: 0 });
+    flowDone = true;
   }
 
-  /* ── Entrance animation ── */
+  /* ════════════════════════════
+     ENTRANCE — ScrollTrigger
+  ════════════════════════════ */
   function runEntrance() {
     if (reducedMotion) { showAll(); return; }
 
     var tl = gsap.timeline({
-      scrollTrigger: { trigger: section, start: 'top 72%', once: true }
+      scrollTrigger: {
+        trigger: section,
+        start: 'top 74%',
+        once: true
+      }
     });
 
-    /* words stagger */
-    tl.to(words, { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power4.out' })
+    tl
+      /* words stagger */
+      .to(words,
+        { opacity: 1, y: 0, duration: 0.52, stagger: 0.08, ease: 'power4.out' }
+      )
+      /* draw wires inline via GSAP — correct attr syntax */
+      .add(function() { drawWires(); }, '-=0.25')
 
-    /* draw horizontal wire */
-    .to(wireH, { strokeDashoffset: 0, duration: 0.6, ease: 'power2.inOut' }, '-=0.2')
-
-    /* draw vertical wires stagger */
-    .to(wires, { strokeDashoffset: 0, duration: 0.4, stagger: 0.08, ease: 'power2.inOut' }, '-=0.35')
-
-    /* tab pills */
-    .to(tabBtns, { opacity: 1, y: 0, duration: 0.3, stagger: 0.06, ease: 'power3.out' }, '-=0.25')
-
-    /* content */
-    .to(contentWrap, { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, '-=0.2')
-
-    /* flow finale */
-    .to(flowFinale, { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' }, '-=0.1')
-
-    .call(function() {
-      setBlobInstant(tabBtns[0]);
-      setWireActive(0);
-      runSweep(false);
-      /* run flow finale lights with delay */
-      gsap.delayedCall(0.6, runFlowFinale);
-    });
+      /* tab pills stagger */
+      .to(tabBtns,
+        { opacity: 1, y: 0, duration: 0.32, stagger: 0.06, ease: 'power3.out' },
+        '-=0.2'
+      )
+      /* content wrap */
+      .to(contentWrap,
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' },
+        '-=0.18'
+      )
+      /* flow finale box */
+      .to(flowFinale,
+        { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' },
+        '-=0.1'
+      )
+      .call(function() {
+        /* blob after all elements are laid out */
+        requestAnimationFrame(function() {
+          setBlobInstant(tabBtns[0]);
+          setWireActive(0);
+        });
+        runSweep(false);
+        /* flow finale sequential lights */
+        gsap.delayedCall(0.5, runFlowFinale);
+      });
   }
 
-  /* ── Init ── */
+  /* ════════════════════════════
+     INIT
+  ════════════════════════════ */
   panels[0].style.display = 'block';
   gsap.set(panels[0], { opacity: 1 });
   counterNum.textContent = '01';
@@ -244,14 +346,16 @@
     showAll();
   }
 
-  /* resize */
+  /* resize → recalculate blob */
   var resizeTimer;
   window.addEventListener('resize', function() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function() {
       isMobile = window.matchMedia('(max-width: 700px)').matches;
-      setBlobInstant(tabBtns[currentIndex]);
-    }, 120);
+      requestAnimationFrame(function() {
+        setBlobInstant(tabBtns[currentIndex]);
+      });
+    }, 150);
   });
 
 })();
